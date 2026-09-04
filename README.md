@@ -25,14 +25,17 @@ codex-document-standard/
 │   └── openai.yaml
 ├── docs/
 │   └── Codex-Document-Standard-使用教程.docx
-└── references/
-    └── style-standard.md
+├── references/
+│   └── style-standard.md
+└── scripts/
+    └── apply_dingtalk_heading_styles.py
 ```
 
 - `SKILL.md`：定义适用场景、执行流程与边界。
 - `agents/openai.yaml`：定义 Skill 在 Codex 中的展示名称和默认提示。
 - `docs/Codex-Document-Standard-使用教程.docx`：按本 Skill 视觉规范排版的正式使用教程。
 - `references/style-standard.md`：完整的文档视觉和结构规范。
+- `scripts/apply_dingtalk_heading_styles.py`：DOCX 转换为钉钉在线文档后，重新写入并校验标题颜色、字号和粗体。
 
 ## 安装
 
@@ -101,6 +104,16 @@ git clone https://github.com/xiehao9991-cpu/codex-document-standard.git "$env:US
 ```text
 使用 $codex-document-standard 统一这份会议纪要的标题、正文和表格样式，不改动原文事实。
 ```
+
+### 钉钉在线文档
+
+钉钉在把 DOCX 转换成在线文档时会清除标题的自定义颜色和字号。转换完成后，需要用返回的文档 `nodeId` 执行：
+
+```bash
+python scripts/apply_dingtalk_heading_styles.py <node-id>
+```
+
+脚本会重新写入 Title、一级、二级和三级标题的颜色、字号与粗体，并读取钉钉原生 JSONML 验证结果。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
 
 ## 默认规则摘要
 
