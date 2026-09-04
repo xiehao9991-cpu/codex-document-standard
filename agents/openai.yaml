@@ -1,0 +1,6 @@
+interface:
+  display_name: "Codex 文档统一标准"
+  short_description: "统一工作文档的标题、正文、表格、链接与校验样式"
+  default_prompt: "Use $codex-document-standard to create or format this professional work document."
+policy:
+  allow_implicit_invocation: true
