@@ -53,6 +53,31 @@ def find_leaf(node):
     return None
 
 
+def iter_leaves(node):
+    if not isinstance(node, list):
+        return
+    if len(node) >= 2 and node[0] == "span" and isinstance(node[1], dict):
+        if node[1].get("data-type") == "leaf":
+            yield node[1]
+    for child in node[2:]:
+        if isinstance(child, list):
+            yield from iter_leaves(child)
+
+
+def is_standard_table(block):
+    if not isinstance(block, list) or not block or block[0] != "table":
+        return False
+    stack = [block]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, list):
+            if len(node) >= 2 and node[0] == "tc" and isinstance(node[1], dict):
+                if node[1].get("fill") == "#005D8D":
+                    return True
+            stack.extend(child for child in node[2:] if isinstance(child, list))
+    return False
+
+
 def style_key(block):
     if not isinstance(block, list) or len(block) < 2 or not isinstance(block[1], dict):
         return None
@@ -67,6 +92,12 @@ def apply_styles(node_id, root):
     targets = []
     for block in root[2:]:
         key = style_key(block)
+        if is_standard_table(block):
+            for leaf in iter_leaves(block):
+                leaf["sz"] = 10
+                leaf["szUnit"] = "pt"
+            targets.append((block[1]["uuid"], block))
+            continue
         if key is None:
             continue
         attrs = block[1]
@@ -144,6 +175,14 @@ def verify_styles(root):
             failures.append(block[1].get("uuid"))
     if failures or not all(counts.values()):
         raise RuntimeError(f"Native heading verification failed: {failures}, counts={counts}")
+    table_failures = []
+    for block in root[2:]:
+        if not is_standard_table(block):
+            continue
+        if any(leaf.get("sz") != 10 or leaf.get("szUnit") != "pt" for leaf in iter_leaves(block)):
+            table_failures.append(block[1].get("uuid"))
+    if table_failures:
+        raise RuntimeError(f"Native table font verification failed: {table_failures}")
     return counts
 
 
@@ -194,7 +233,7 @@ def main():
         raise RuntimeError(
             f"DingTalk contains {empty_count} empty paragraph blocks; remove spacer paragraphs from the source DOCX and reconvert."
         )
-    print(f"PASS updated={count} verified={counts} empty_paragraphs=0")
+    print(f"PASS updated={count} verified={counts} native_table_text=10pt empty_paragraphs=0")
 
 
 if __name__ == "__main__":

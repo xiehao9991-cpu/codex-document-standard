@@ -113,7 +113,7 @@ git clone https://github.com/xiehao9991-cpu/codex-document-standard.git "$env:US
 python scripts/apply_dingtalk_heading_styles.py <node-id>
 ```
 
-脚本会重新写入 Title、一级、二级和三级标题的颜色、字号、粗体及段落间距，并读取钉钉原生 JSONML 验证结果。源 DOCX 不得使用空白段落制造间距；脚本检测到空白块时会直接报错。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
+脚本会重新写入 Title、一级、二级和三级标题的颜色、字号、粗体及段落间距，并把钉钉标准表格文字规范为 10 pt。随后读取钉钉原生 JSONML 验证结果。源 DOCX 不得使用空白段落制造间距；脚本检测到空白块时会直接报错。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
 
 ## 默认规则摘要
 
@@ -122,6 +122,7 @@ python scripts/apply_dingtalk_heading_styles.py <node-id>
 - 深色表头：`#005D8D`。
 - 标题：使用连续的 H1–H4 层级。
 - 正文：默认 10.5 pt、1.2 倍行距。
+- 标准表格：本地 DOCX 的表头和正文均为 10.5 pt，与外部正文一致；钉钉在线文档保留 10 pt。
 - 表格：文字左对齐、数字右对齐、日期和状态居中。
 - 空值：统一使用 `—`。
 - 日期：统一使用 `YYYY-MM-DD`。
