@@ -4,16 +4,21 @@
 
 它统一了标题层级、字体、颜色、段落间距、说明块、表格、链接与证据格式。用户本次要求、公司模板或已有文档样式始终优先。
 
+需要可下载、可打印的统一格式版本，请使用 [`Codex Document Standard 使用教程`](docs/Codex-Document-Standard-使用教程.docx)。
+
 ## 包含内容
 
 ```text
 codex-document-standard/
 ├── SKILL.md
+├── docs/
+│   └── Codex-Document-Standard-使用教程.docx
 └── references/
     └── style-standard.md
 ```
 
 - `SKILL.md`：定义适用场景、执行流程与边界。
+- `docs/Codex-Document-Standard-使用教程.docx`：按本 Skill 视觉规范排版的正式使用教程。
 - `references/style-standard.md`：完整的文档视觉和结构规范。
 
 ## 安装
