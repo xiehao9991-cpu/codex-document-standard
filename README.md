@@ -6,11 +6,23 @@
 
 需要可下载、可打印的统一格式版本，请使用 [`Codex Document Standard 使用教程`](docs/Codex-Document-Standard-使用教程.docx)。
 
+## 访问与分享
+
+本仓库是公开仓库。使用者无需登录 GitHub，直接打开下面的链接即可查看、下载或安装：
+
+- 仓库主页：[github.com/xiehao9991-cpu/codex-document-standard](https://github.com/xiehao9991-cpu/codex-document-standard)
+- Word 使用教程：[Download DOCX](https://raw.githubusercontent.com/xiehao9991-cpu/codex-document-standard/main/docs/Codex-Document-Standard-%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B.docx)
+- Git 克隆地址：`https://github.com/xiehao9991-cpu/codex-document-standard.git`
+
+分享给别人时，发送仓库主页链接即可。
+
 ## 包含内容
 
 ```text
 codex-document-standard/
 ├── SKILL.md
+├── agents/
+│   └── openai.yaml
 ├── docs/
 │   └── Codex-Document-Standard-使用教程.docx
 └── references/
@@ -18,6 +30,7 @@ codex-document-standard/
 ```
 
 - `SKILL.md`：定义适用场景、执行流程与边界。
+- `agents/openai.yaml`：定义 Skill 在 Codex 中的展示名称和默认提示。
 - `docs/Codex-Document-Standard-使用教程.docx`：按本 Skill 视觉规范排版的正式使用教程。
 - `references/style-standard.md`：完整的文档视觉和结构规范。
 
