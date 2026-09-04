@@ -113,7 +113,7 @@ git clone https://github.com/xiehao9991-cpu/codex-document-standard.git "$env:US
 python scripts/apply_dingtalk_heading_styles.py <node-id>
 ```
 
-脚本会重新写入 Title、一级、二级和三级标题的颜色、字号与粗体，并读取钉钉原生 JSONML 验证结果。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
+脚本会重新写入 Title、一级、二级和三级标题的颜色、字号、粗体及段落间距，并读取钉钉原生 JSONML 验证结果。源 DOCX 不得使用空白段落制造间距；脚本检测到空白块时会直接报错。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
 
 ## 默认规则摘要
 

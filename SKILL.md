@@ -15,8 +15,8 @@ Use this skill to make Codex-authored work documents visually consistent across 
    - If no, use the standard as the visual and structural default.
 3. Adapt table column count and width to the content while keeping the standard colors, typography, spacing, and hierarchy.
 4. Use verified facts and real links. Never fabricate evidence, metrics, dates, owners, or URLs.
-5. For DingTalk online documents created by converting a DOCX, run `scripts/apply_dingtalk_heading_styles.py <node-id>` after conversion. DingTalk strips title color and size during import, so DOCX-only verification is insufficient.
-6. Verify the rendered or native document before completion. For DingTalk, inspect the native JSONML after the style pass. Check headings, spacing, tables, links, overflow, merged cells, and unchanged fixed content.
+5. For DingTalk online documents created by converting a DOCX, run `scripts/apply_dingtalk_heading_styles.py <node-id>` after conversion. DingTalk strips title formatting during import and turns spacer paragraphs into visible blank blocks, so DOCX-only verification is insufficient.
+6. Verify the rendered or native document before completion. For DingTalk, inspect the native JSONML after the style pass and require zero empty paragraph blocks. Check headings, spacing, tables, links, overflow, merged cells, and unchanged fixed content.
 
 ## Boundaries
 

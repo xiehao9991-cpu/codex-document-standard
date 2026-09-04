@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 STYLES = {
-    "Title": {"size": 18, "color": "#2F75B5"},
-    "h1": {"size": 14, "color": "#2F75B5"},
-    "h2": {"size": 12.5, "color": "#2F75B5"},
-    "h3": {"size": 11.5, "color": "#2F75B5"},
+    "Title": {"size": 18, "color": "#2F75B5", "before": "8pt", "after": "4pt"},
+    "h1": {"size": 14, "color": "#2F75B5", "before": "8pt", "after": "4pt"},
+    "h2": {"size": 12.5, "color": "#2F75B5", "before": "8pt", "after": "4pt"},
+    "h3": {"size": 11.5, "color": "#2F75B5", "before": "8pt", "after": "4pt"},
 }
 
 
@@ -74,6 +74,12 @@ def apply_styles(node_id, root):
         if leaf is None:
             raise RuntimeError(f"No text leaf found for block {attrs.get('uuid')}")
         spec = STYLES[key]
+        attrs["spacing"] = {
+            "before": spec["before"],
+            "after": spec["after"],
+            "line": 1.15,
+            "lineRule": "auto",
+        }
         leaf.update(
             {
                 "bold": True,
@@ -127,11 +133,43 @@ def verify_styles(root):
             or leaf.get("szUnit") != "pt"
             or leaf.get("color") != spec["color"]
             or leaf.get("bold") is not True
+            or block[1].get("spacing")
+            != {
+                "before": spec["before"],
+                "after": spec["after"],
+                "line": 1.15,
+                "lineRule": "auto",
+            }
         ):
             failures.append(block[1].get("uuid"))
     if failures or not all(counts.values()):
         raise RuntimeError(f"Native heading verification failed: {failures}, counts={counts}")
     return counts
+
+
+def count_empty_paragraphs(root):
+    count = 0
+    for block in root[2:]:
+        if not isinstance(block, list) or not block or block[0] != "p":
+            continue
+        text = "".join(
+            value
+            for node in block[2:]
+            if isinstance(node, list)
+            for value in flatten_text(node)
+        )
+        if not text.strip():
+            count += 1
+    return count
+
+
+def flatten_text(node):
+    for value in node:
+        if isinstance(value, str):
+            if value not in {"span", "p"}:
+                yield value
+        elif isinstance(value, list):
+            yield from flatten_text(value)
 
 
 def main():
@@ -148,9 +186,15 @@ def main():
         before_path = Path(temp_dir) / "before.json"
         after_path = Path(temp_dir) / "after.json"
         count = apply_styles(args.node_id, read_jsonml(args.node_id, before_path))
-        counts = verify_styles(read_jsonml(args.node_id, after_path))
+        after_root = read_jsonml(args.node_id, after_path)
+        counts = verify_styles(after_root)
+        empty_count = count_empty_paragraphs(after_root)
 
-    print(f"PASS updated={count} verified={counts}")
+    if empty_count:
+        raise RuntimeError(
+            f"DingTalk contains {empty_count} empty paragraph blocks; remove spacer paragraphs from the source DOCX and reconvert."
+        )
+    print(f"PASS updated={count} verified={counts} empty_paragraphs=0")
 
 
 if __name__ == "__main__":
