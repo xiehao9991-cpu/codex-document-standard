@@ -1,2 +1,4 @@
 AGENTS.md
 MEMORY.md
+__pycache__/
+*.pyc

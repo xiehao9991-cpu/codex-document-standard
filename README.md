@@ -28,7 +28,9 @@ codex-document-standard/
 ├── references/
 │   └── style-standard.md
 └── scripts/
-    └── apply_dingtalk_heading_styles.py
+    ├── apply_dingtalk_heading_styles.py
+    ├── normalize_docx_tables.py
+    └── table_format_common.py
 ```
 
 - `SKILL.md`：定义适用场景、执行流程与边界。
@@ -36,6 +38,8 @@ codex-document-standard/
 - `docs/Codex-Document-Standard-使用教程.docx`：按本 Skill 视觉规范排版的正式使用教程。
 - `references/style-standard.md`：完整的文档视觉和结构规范。
 - `scripts/apply_dingtalk_heading_styles.py`：DOCX 转换为钉钉在线文档后，重新写入并校验标题颜色、字号和粗体。
+- `scripts/normalize_docx_tables.py`：递归规范并校验本地 DOCX 的数据表，包括嵌套子表、数字字体和单行居中／多行整格左对齐；保留说明块、代码块和原始数据。
+- `tests/test_table_formats.py`：数字、不同原表头颜色、多子表和漏表检测的回归测试。
 
 ## 安装
 
@@ -110,10 +114,26 @@ git clone https://github.com/xiehao9991-cpu/codex-document-standard.git "$env:US
 钉钉在把 DOCX 转换成在线文档时会清除标题的自定义颜色和字号。转换完成后，需要用返回的文档 `nodeId` 执行：
 
 ```bash
-python scripts/apply_dingtalk_heading_styles.py <node-id>
+python scripts/apply_dingtalk_heading_styles.py <node-id> --expected-tables N --font "Microsoft YaHei"
 ```
 
 脚本会重新写入 Title、一级、二级和三级标题的颜色、字号、粗体及段落间距，并把钉钉标准表格文字规范为 10 pt。随后读取钉钉原生 JSONML 验证结果。源 DOCX 不得使用空白段落制造间距；脚本检测到空白块时会直接报错。仅检查导出的 DOCX 不能证明钉钉页面显示一致。
+
+`N` 替换为源文档独立清点的全部表格数量，包含说明块、布局容器和嵌套子表。脚本需要已登录的 `dws` 命令行；不会自动安装或登录。导入后丢表会停止处理。数字、中文使用同一字体，字体名称应替换为目标平台可用的字体。表格数量相同不代表合并、布局或屏幕效果完全相同，仍须复核。
+
+含嵌套子表时，DOCX 导入可能损失结构。此时需要 Codex 基于源文档通过钉钉原生 JSONML 保留或恢复子表，再运行样式检查。不要把 `N` 改小来绕过丢表检查；样式脚本不会自动补回导入过程中丢失的表。
+
+### 本地 DOCX 完整规范化
+
+仅在整份文档需要本规范时使用；局部修改不要运行全篇脚本。需要 Python 和 `python-docx`。
+
+```bash
+python scripts/normalize_docx_tables.py input.docx --output checked.docx --expected-tables N
+python scripts/normalize_docx_tables.py checked.docx --check --expected-tables N
+python -m unittest discover -s tests -v
+```
+
+输出到新文件，不覆盖原文件。每个数据子表都检查 10.5 pt、字体、字重、颜色、行距和对齐；说明块、代码块单独保留。工号等标识符不转成数字，前导零不会被删除。这里的子表指文档内部的表格，不是 Excel 工作表或钉钉 AI 表格标签页。
 
 ## 默认规则摘要
 
@@ -123,7 +143,8 @@ python scripts/apply_dingtalk_heading_styles.py <node-id>
 - 标题：使用连续的 H1–H4 层级。
 - 正文：默认 10.5 pt、1.2 倍行距。
 - 标准表格：本地 DOCX 的表头和正文均为 10.5 pt，与外部正文一致；钉钉在线文档保留 10 pt。
-- 表格：文字左对齐、数字右对齐、日期和状态居中。
+- 数据表格：每格显示一行时居中，两行及以上时整格左对齐，手动换行、多个段落和自动换行都算；不是指表格第二行以后。表头、分区行、正文和所有子表均适用，字号、颜色、边距不变；表外正文与说明／代码块不受影响。
+- 自动换行须在实际查看器中复核。脚本优先使用已安装的 Pillow 和目标字体测量宽度；缺少字体时会提示使用估算，缺少列宽时只能识别显式多行。估算不能代替页面检查，改变内容或列宽后需要重新检查。
 - 空值：统一使用 `—`。
 - 日期：统一使用 `YYYY-MM-DD`。
 - 内容：结论先行，只使用有记录支持的事实和真实链接。
